@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMsg = document.getElementById('error-msg');
     const resultSection = document.getElementById('result-section');
     const loadingIndicator = document.getElementById('loading-indicator');
-    
+
     // Score & Winner Elements
     const elScoreUser = document.getElementById('score-user');
     const elScoreComp = document.getElementById('score-competitor');
@@ -15,11 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardComp = document.getElementById('card-competitor');
     const winnerBanner = document.getElementById('winner-banner');
     const winnerText = document.getElementById('winner-text');
-    
+
     // Labels
     const labelUser = document.getElementById('label-user');
     const labelComp = document.getElementById('label-competitor');
-    
+
     // Metrics Elements
     const metrics = {
         title: [document.getElementById('metric-title-user'), document.getElementById('metric-title-comp')],
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Listeners
     btnStart.addEventListener('click', startDuel);
     btnReset.addEventListener('click', resetDuel);
-    
+
     // Remove error when typing
     [inputUser, inputComp].forEach(input => {
         input.addEventListener('input', () => {
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. Validate
         const userUrl = inputUser.value.trim();
         const compUrl = inputComp.value.trim();
-        
+
         if (!userUrl || !compUrl) {
             errorMsg.classList.remove('hidden');
             return;
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnStart.classList.add('hidden');
         loadingIndicator.classList.remove('hidden');
         errorMsg.classList.add('hidden');
-        
+
         // Simulate API delay
         setTimeout(() => {
             generateResults(userUrl, compUrl);
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. Logic: Generate Data
         const userScore = getRandomScore(60, 95);
         const compScore = getRandomScore(40, 90);
-        
+
         // Update Labels
         labelUser.textContent = formatUrl(userUrl);
         labelComp.textContent = formatUrl(compUrl);
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Determine Winner
         const userWins = userScore >= compScore;
-        
+
         // Generate Mock Metrics based on scores (higher score gets better metrics)
         populateMetrics(0, userScore); // 0 index for user
         populateMetrics(1, compScore); // 1 index for competitor
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 4. Reveal Results
         loadingIndicator.classList.add('hidden');
         resultSection.classList.remove('hidden');
-        
+
         // Highlight Winner
         if (userWins) {
             cardUser.classList.add('winner');
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cardUser.classList.remove('winner');
             winnerText.textContent = "Competitor Wins";
             winnerBanner.style.background = "linear-gradient(to right, #ef4444, #f87171)";
-             winnerBanner.style.webkitBackgroundClip = "text";
+            winnerBanner.style.webkitBackgroundClip = "text";
         }
         winnerBanner.classList.remove('hidden');
     }
@@ -114,11 +114,11 @@ document.addEventListener('DOMContentLoaded', () => {
         resultSection.classList.add('hidden');
         btnStart.classList.remove('hidden');
         winnerBanner.classList.add('hidden');
-        
+
         // Reset Cards styles
         cardUser.classList.remove('winner');
         cardComp.classList.remove('winner');
-        
+
         // Clear Inputs? (Optional, maybe keep them for tweaking)
         // inputUser.value = '';
         // inputComp.value = '';
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateMetrics(colIndex, score) {
         // High score = better metrics logic (mock)
         const good = score > 70;
-        
+
         // Title Length (Optimal: 50-60)
         const titleLen = good ? getRandomScore(50, 60) : getRandomScore(20, 90);
         metrics.title[colIndex].textContent = `${titleLen} chars`;
@@ -182,3 +182,16 @@ document.addEventListener('DOMContentLoaded', () => {
         metrics.mob[colIndex].style.color = isMobile ? 'var(--success)' : 'var(--danger)';
     }
 });
+
+function toggleList(listId, triggerEl) {
+    const list = document.getElementById(listId);
+    list.classList.toggle('open');
+
+    // Optional: Update text
+    if (list.classList.contains('open')) {
+        triggerEl.textContent = "Show less";
+    } else {
+        const count = listId === 'list-auth' ? 7 : 9;
+        triggerEl.textContent = `Includes ${count} checks`;
+    }
+}

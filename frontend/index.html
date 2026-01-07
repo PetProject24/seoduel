@@ -158,7 +158,13 @@
                         <li>Content length</li>
                         <li>Keyword density</li>
                     </ul>
-                    <p class="check-count">Includes 9 checks</p>
+                    <ul class="expanded-list" id="list-onpage">
+                        <li>Title keyword presence</li>
+                        <li>Meta description length</li>
+                        <li>H1 presence</li>
+                        <li>H1 uniqueness</li>
+                    </ul>
+                    <p class="check-count" onclick="toggleList('list-onpage', this)">Includes 9 checks</p>
                 </div>
 
                 <!-- Group 2 -->
@@ -171,7 +177,13 @@
                         <li>Indexability</li>
                         <li>Core Web Vitals</li>
                     </ul>
-                    <p class="check-count">Includes 9 checks</p>
+                    <ul class="expanded-list" id="list-tech">
+                        <li>Robots.txt presence</li>
+                        <li>Sitemap.xml presence</li>
+                        <li>Canonical tag</li>
+                        <li>Redirects</li>
+                    </ul>
+                    <p class="check-count" onclick="toggleList('list-tech', this)">Includes 9 checks</p>
                 </div>
 
                 <!-- Group 3 -->
@@ -183,7 +195,12 @@
                         <li>External links</li>
                         <li>Domain age</li>
                     </ul>
-                    <p class="check-count">Includes 7 checks</p>
+                    <ul class="expanded-list" id="list-auth">
+                        <li>Referring domains</li>
+                        <li>Nofollow ratio</li>
+                        <li>Anchor text diversity</li>
+                    </ul>
+                    <p class="check-count" onclick="toggleList('list-auth', this)">Includes 7 checks</p>
                 </div>
             </div>
         </section>
