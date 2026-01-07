@@ -542,3 +542,14 @@ footer {
 .info-card li:last-child {
   border-bottom: none;
 }
+
+.check-count {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border-color);
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 500;
+  text-align: right;
+  opacity: 0.8;
+}
