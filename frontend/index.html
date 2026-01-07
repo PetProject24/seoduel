@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEOduel - Compare Website SEO Scores</title>
+    <meta name="description" content="Compare your website with competitors in seconds. Free SEO comparison tool.">
+
+    <!-- Google Fonts: Inter for clean typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- Header -->
+        <header>
+            <div class="badge">⚔️ Compare SEO instantly • Free demo</div>
+            <h1 class="logo">See who wins the SEO duel in seconds</h1>
+            <p class="tagline">Enter your website and a competitor to instantly compare key SEO metrics and see who
+                ranks stronger.</p>
+        </header>
+
+        <!-- Main Input Section -->
+        <main>
+            <div class="duel-inputs">
+                <div class="input-group">
+                    <label for="your-site">Your Website</label>
+                    <input type="text" id="your-site" placeholder="example.com" autocomplete="off">
+                </div>
+
+                <div class="vs-badge">VS</div>
+
+                <div class="input-group">
+                    <label for="competitor-site">Competitor Website</label>
+                    <input type="text" id="competitor-site" placeholder="competitor.com" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="action-area">
+                <button id="start-duel-btn" class="primary-btn">Start Duel</button>
+                <div id="loading-indicator" class="loading hidden">
+                    <div class="spinner"></div> Analyzing...
+                </div>
+                <p id="error-msg" class="error-message hidden">Please enter both website URLs.</p>
+            </div>
+
+            <ul class="feature-list">
+                <li><span class="check-icon">✓</span> 25+ SEO metrics</li>
+                <li><span class="check-icon">✓</span> Instant comparison</li>
+                <li><span class="check-icon">✓</span> No login required</li>
+            </ul>
+        </main>
+
+        <!-- Results Section (Hidden initially) -->
+        <section id="result-section" class="results-container hidden">
+
+            <div class="score-cards">
+                <!-- Your Score -->
+                <div class="score-card" id="card-user">
+                    <h3>Your Site</h3>
+                    <div class="score-circle">
+                        <svg viewBox="0 0 36 36" class="circular-chart user-chart">
+                            <path class="circle-bg"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="circle" stroke-dasharray="0, 100"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <text x="18" y="20.35" class="percentage" id="score-user">0</text>
+                        </svg>
+                    </div>
+                    <p class="url-label" id="label-user">example.com</p>
+                </div>
+
+                <!-- Competitor Score -->
+                <div class="score-card" id="card-competitor">
+                    <h3>Competitor</h3>
+                    <div class="score-circle">
+                        <svg viewBox="0 0 36 36" class="circular-chart competitor-chart">
+                            <path class="circle-bg"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="circle" stroke-dasharray="0, 100"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <text x="18" y="20.35" class="percentage" id="score-competitor">0</text>
+                        </svg>
+                    </div>
+                    <p class="url-label" id="label-competitor">competitor.com</p>
+                </div>
+            </div>
+
+            <div id="winner-banner" class="winner-banner hidden">
+                <span id="winner-text">You Win!</span>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th class="col-user">Your Site</th>
+                            <th class="col-comp">Competitor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Title Length</td>
+                            <td id="metric-title-user">60 chars</td>
+                            <td id="metric-title-comp">45 chars</td>
+                        </tr>
+                        <tr>
+                            <td>Meta Description</td>
+                            <td id="metric-desc-user">Present</td>
+                            <td id="metric-desc-comp">Missing</td>
+                        </tr>
+                        <tr>
+                            <td>Headings</td>
+                            <td id="metric-h-user">Good</td>
+                            <td id="metric-h-comp">Poor</td>
+                        </tr>
+                        <tr>
+                            <td>Word Count</td>
+                            <td id="metric-wc-user">1,200</td>
+                            <td id="metric-wc-comp">850</td>
+                        </tr>
+                        <tr>
+                            <td>Mobile Friendly</td>
+                            <td id="metric-mob-user">Yes</td>
+                            <td id="metric-mob-comp">No</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button id="reset-btn" class="secondary-btn">New Comparison</button>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>SEOduel MVP — Demo version. Results are simulated.</p>
+        </footer>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
