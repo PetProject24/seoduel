@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 
-
 // Helper components
 const CountUp = ({ end, duration = 1500 }: { end: number; duration?: number }) => {
   const [count, setCount] = useState(0);
@@ -39,6 +38,8 @@ export default function Home() {
       user: any;
       comp: any;
     };
+    userReport?: any;
+    compReport?: any;
   } | null>(null);
 
   // Toggle states for info sections
@@ -70,49 +71,28 @@ export default function Home() {
         fetchAnalysis(compUrl)
       ]);
 
-      const calculateScore = (data: any) => {
-        let score = 100;
-        if (!data.onpage.title.exists) score -= 20;
-        else if (data.onpage.title.length < 30 || data.onpage.title.length > 60) score -= 5;
-
-        if (!data.onpage.meta.exists) score -= 15;
-        if (!data.onpage.headings.h1Exists) score -= 15;
-        if (!data.onpage.headings.h1Unique) score -= 5;
-        if (data.onpage.content.wordCount < 300) score -= 10;
-
-        if (!data.technical.https) score -= 10;
-        if (data.technical.noindex) score -= 20;
-
-        return Math.max(0, score);
-      };
-
       const mapMetrics = (data: any) => ({
         title: data.onpage.title.exists ? `${data.onpage.title.length} chars` : "Missing",
         isTitleGood: data.onpage.title.exists && data.onpage.title.length >= 30 && data.onpage.title.length <= 60,
-
         desc: data.onpage.meta.exists ? "Optimized" : "Missing",
         isDescGood: data.onpage.meta.exists,
-
         headings: data.onpage.headings.h1Exists ? (data.onpage.headings.h1Unique ? "Well Structured" : "Multiple H1s") : "Missing H1",
         isHeadingsGood: data.onpage.headings.h1Exists && data.onpage.headings.h1Unique,
-
         wc: data.onpage.content.wordCount,
-
         mob: data.technical.https ? "Secure (HTTPS)" : "Not Secure",
         isMobGood: data.technical.https,
       });
 
-      const userScore = calculateScore(userData);
-      const compScore = calculateScore(compData);
-
       setResults({
-        userScore,
-        compScore,
-        userWins: userScore >= compScore,
+        userScore: userData.report.score,
+        compScore: compData.report.score,
+        userWins: userData.report.score >= compData.report.score,
         metrics: {
           user: mapMetrics(userData),
           comp: mapMetrics(compData)
-        }
+        },
+        userReport: userData.report,
+        compReport: compData.report
       });
 
       setShowResults(true);
@@ -182,6 +162,12 @@ export default function Home() {
           </div>
         </div>
 
+        <ul className="feature-list">
+          <li><span className="check-icon">✓</span> 25+ SEO metrics</li>
+          <li><span className="check-icon">✓</span> Instant comparison</li>
+          <li><span className="check-icon">✓</span> No login required</li>
+        </ul>
+
         <div className="action-area">
           {!showResults && !isLoading && (
             <button id="start-duel-btn" className="primary-btn" onClick={startDuel}>Start Duel</button>
@@ -197,12 +183,6 @@ export default function Home() {
             <p id="error-msg" className="error-message">Please enter both website URLs.</p>
           )}
         </div>
-
-        <ul className="feature-list">
-          <li><span className="check-icon">✓</span> 25+ SEO metrics</li>
-          <li><span className="check-icon">✓</span> Instant comparison</li>
-          <li><span className="check-icon">✓</span> No login required</li>
-        </ul>
       </main>
 
       {/* Results Section */}
@@ -248,7 +228,7 @@ export default function Home() {
           <div id="winner-banner" className="winner-banner" style={{
             background: results.userWins ? "linear-gradient(to right, #22c55e, #4ade80)" : "linear-gradient(to right, #ef4444, #f87171)",
             WebkitBackgroundClip: "text",
-            backgroundClip: "text" // Added standard property
+            backgroundClip: "text"
           }}>
             <span id="winner-text">{results.userWins ? "You Win!" : "Competitor Wins"}</span>
           </div>
@@ -373,93 +353,62 @@ export default function Home() {
 
       {/* Duel Results & Strategy Section */}
       <section className="strategy-section">
-        <div className="section-header">
-          <h2>Duel results & winning strategy</h2>
-          <p>See who wins the SEO duel and what to improve to take the lead.</p>
-        </div>
-
         <div className="strategy-grid">
-          {/* Left Column: Legend */}
-          <div className="strategy-col legend-col">
-            <h3>Priority Legend</h3>
-            <ul className="legend-list">
-              <li className="legend-item critical">
-                <span className="dot critical-dot"></span>
-                <div>
-                  <strong>Critical</strong>
-                  <span> — blocks your rankings</span>
-                </div>
-              </li>
-              <li className="legend-item warning">
-                <span className="dot warning-dot"></span>
-                <div>
-                  <strong>Warning</strong>
-                  <span> — limits growth</span>
-                </div>
-              </li>
-              <li className="legend-item good">
-                <span className="dot good-dot"></span>
-                <div>
-                  <strong>Good</strong>
-                  <span> — already optimized</span>
-                </div>
-              </li>
-            </ul>
-          </div>
+          <h2 className="dashboard-title">How to win this SEO duel</h2>
 
-          {/* Right Column: Results & Actions */}
-          <div className="strategy-col content-col">
-            {/* Result Card (Mock) */}
-            <div className="strategy-result-card">
-              <div className="strat-score-row">
-                <div className={`strat-site ${results && results.userWins ? 'winner' : ''}`}>
-                  <span className="site-name">Your Website</span>
-                  <div className="strat-progress">
-                    <div className="strat-bar user-bar" style={{ width: results ? `${Math.min(results.userScore, 100)}%` : '45%' }}></div>
-                  </div>
-                  <span className="score-num">{results ? results.userScore : 45}</span>
-                </div>
-                <div className={`strat-site ${results && !results.userWins ? 'winner' : ''}`}>
-                  <span className="site-name">Competitor</span>
-                  <div className="strat-progress">
-                    <div className="strat-bar comp-bar" style={{ width: results ? `${Math.min(results.compScore, 100)}%` : '78%' }}></div>
-                  </div>
-                  <span className="score-num">{results ? results.compScore : 78}</span>
-                </div>
-              </div>
-              <div className="strat-winner-badge" style={{ color: results ? (results.userWins ? 'var(--success)' : 'var(--accent)') : 'var(--accent)' }}>
-                {results ? (results.userWins ? 'Winner: You' : 'Winner: Competitor') : 'Winner: Competitor'}
-              </div>
+          {userUrl && (
+            <div className="dashboard-domain-divider">
+              <span>{formatUrl(userUrl)}</span>
             </div>
+          )}
 
-            {/* Action Plan */}
-            <div className="action-plan">
-              <h3>How to win this SEO duel</h3>
-
-              <div className="action-item item-critical">
-                <div className="icon-box">!</div>
-                <div className="action-content">
-                  <strong>Fix missing H1 tags</strong>
-                  <p>Critical impact on search visibility.</p>
-                </div>
-              </div>
-
-              <div className="action-item item-warning">
-                <div className="icon-box">⚠</div>
-                <div className="action-content">
-                  <strong>Improve page speed</strong>
-                  <p>Slow load times increase bounce rates.</p>
-                </div>
-              </div>
-
-              <div className="action-item item-good">
-                <div className="icon-box">✓</div>
-                <div className="action-content">
-                  <strong>HTTPS is active</strong>
-                  <p>Secure connection established.</p>
-                </div>
-              </div>
+          {results?.userReport?.seoBreakdown && (
+            <div className="dashboard-breakdown">
+              {(['onPage', 'technical', 'authority'] as const).map((key) => {
+                const cat = results.userReport.seoBreakdown[key];
+                return (
+                  <div key={key} className="breakdown-item">
+                    <div className="breakdown-info">
+                      <span className="breakdown-label">{cat.label}</span>
+                      <span className="breakdown-score">{cat.score}%</span>
+                    </div>
+                    <div className="breakdown-bar-bg">
+                      <div
+                        className={`breakdown-bar bar-${cat.priority}`}
+                        style={{ width: `${cat.score}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
+          )}
+
+          <div className="dashboard-grid">
+            {(() => {
+              const flatMetrics = results?.userReport?.sections?.flatMap((s: any) => s.metrics) || [];
+              const severityOrder = { critical: 1, warning: 2, good: 3, unknown: 4 };
+              const filteredMetrics = flatMetrics.filter((m: any) => m.status !== 'unknown');
+              const sortedMetrics = [...filteredMetrics].sort((a: any, b: any) =>
+                (severityOrder[a.status as keyof typeof severityOrder] || 5) -
+                (severityOrder[b.status as keyof typeof severityOrder] || 5)
+              );
+
+              return sortedMetrics.map((item: any, i: number) => {
+                const icon = item.status === 'critical' ? '🔴' : item.status === 'warning' ? '🟡' : '🟢';
+
+                return (
+                  <div key={i} className={`dashboard-card status-${item.status}`}>
+                    <span className="card-icon-title">{icon} {item.title}</span>
+                    <div className="card-details">
+                      <p><strong>Problem:</strong> {item.plainExplanation}</p>
+                      <p><strong>Impact:</strong> {item.whyItMatters}</p>
+                      <p><strong>Next step:</strong> {item.action}</p>
+                    </div>
+                  </div>
+                );
+              });
+            })()}
           </div>
         </div>
       </section>
