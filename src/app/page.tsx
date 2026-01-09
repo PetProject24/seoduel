@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { compareSeo } from "./actions";
+
 
 // Helper components
 const CountUp = ({ end, duration = 1500 }: { end: number; duration?: number }) => {
@@ -55,9 +55,68 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      const data = await compareSeo(userUrl, compUrl);
-      setResults(data);
+      const fetchAnalysis = async (url: string) => {
+        const res = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url })
+        });
+        if (!res.ok) throw new Error("Analysis failed");
+        return res.json();
+      };
+
+      const [userData, compData] = await Promise.all([
+        fetchAnalysis(userUrl),
+        fetchAnalysis(compUrl)
+      ]);
+
+      const calculateScore = (data: any) => {
+        let score = 100;
+        if (!data.onpage.title.exists) score -= 20;
+        else if (data.onpage.title.length < 30 || data.onpage.title.length > 60) score -= 5;
+
+        if (!data.onpage.meta.exists) score -= 15;
+        if (!data.onpage.headings.h1Exists) score -= 15;
+        if (!data.onpage.headings.h1Unique) score -= 5;
+        if (data.onpage.content.wordCount < 300) score -= 10;
+
+        if (!data.technical.https) score -= 10;
+        if (data.technical.noindex) score -= 20;
+
+        return Math.max(0, score);
+      };
+
+      const mapMetrics = (data: any) => ({
+        title: data.onpage.title.exists ? `${data.onpage.title.length} chars` : "Missing",
+        isTitleGood: data.onpage.title.exists && data.onpage.title.length >= 30 && data.onpage.title.length <= 60,
+
+        desc: data.onpage.meta.exists ? "Optimized" : "Missing",
+        isDescGood: data.onpage.meta.exists,
+
+        headings: data.onpage.headings.h1Exists ? (data.onpage.headings.h1Unique ? "Well Structured" : "Multiple H1s") : "Missing H1",
+        isHeadingsGood: data.onpage.headings.h1Exists && data.onpage.headings.h1Unique,
+
+        wc: data.onpage.content.wordCount,
+
+        mob: data.technical.https ? "Secure (HTTPS)" : "Not Secure",
+        isMobGood: data.technical.https,
+      });
+
+      const userScore = calculateScore(userData);
+      const compScore = calculateScore(compData);
+
+      setResults({
+        userScore,
+        compScore,
+        userWins: userScore >= compScore,
+        metrics: {
+          user: mapMetrics(userData),
+          comp: mapMetrics(compData)
+        }
+      });
+
       setShowResults(true);
+
     } catch (err) {
       console.error(err);
       setError(true);
