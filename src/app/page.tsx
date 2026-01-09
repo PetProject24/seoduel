@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import { compareSeo } from "./actions";
 
 // Helper components
 const CountUp = ({ end, duration = 1500 }: { end: number; duration?: number }) => {
@@ -45,7 +46,7 @@ export default function Home() {
   const [expandedTech, setExpandedTech] = useState(false);
   const [expandedAuth, setExpandedAuth] = useState(false);
 
-  const startDuel = () => {
+  const startDuel = async () => {
     if (!userUrl.trim() || !compUrl.trim()) {
       setError(true);
       return;
@@ -53,54 +54,16 @@ export default function Home() {
     setError(false);
     setIsLoading(true);
 
-    // Simulate API delay
-    setTimeout(() => {
-      generateResults();
-      setIsLoading(false);
+    try {
+      const data = await compareSeo(userUrl, compUrl);
+      setResults(data);
       setShowResults(true);
-    }, 1500);
-  };
-
-  const getRandomScore = (min: number, max: number) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
-
-  const generateResults = () => {
-    const uScore = getRandomScore(60, 95);
-    const cScore = getRandomScore(40, 90);
-    const userGood = uScore > 70;
-    const compGood = cScore > 70;
-
-    const newResults = {
-      userScore: uScore,
-      compScore: cScore,
-      userWins: uScore >= cScore,
-      metrics: {
-        user: {
-          title: userGood ? getRandomScore(50, 60) + " chars" : getRandomScore(20, 90) + " chars",
-          isTitleGood: userGood || (uScore > 60 && uScore < 80),
-          desc: (userGood || Math.random() > 0.3) ? "Optimized" : "Missing",
-          isDescGood: userGood || Math.random() > 0.3,
-          headings: userGood ? "Well Structured" : "Unstructured",
-          isHeadingsGood: userGood,
-          wc: userGood ? getRandomScore(800, 2000) : getRandomScore(100, 500),
-          mob: (userGood || Math.random() > 0.4) ? "Yes" : "Issues Found",
-          isMobGood: userGood || Math.random() > 0.4,
-        },
-        comp: {
-          title: compGood ? getRandomScore(50, 60) + " chars" : getRandomScore(20, 90) + " chars",
-          isTitleGood: compGood || (cScore > 60 && cScore < 80),
-          desc: (compGood || Math.random() > 0.3) ? "Optimized" : "Missing",
-          isDescGood: compGood || Math.random() > 0.3,
-          headings: compGood ? "Well Structured" : "Unstructured",
-          isHeadingsGood: compGood,
-          wc: compGood ? getRandomScore(800, 2000) : getRandomScore(100, 500),
-          mob: (compGood || Math.random() > 0.4) ? "Yes" : "Issues Found",
-          isMobGood: compGood || Math.random() > 0.4,
-        }
-      }
-    };
-    setResults(newResults);
+    } catch (err) {
+      console.error(err);
+      setError(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const resetDuel = () => {
