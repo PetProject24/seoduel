@@ -119,10 +119,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* Standard line-clamp for compatibility */
-.google-desc {
-  line-clamp: 2;
-}
 
 .nav-actions {
   justify-self: end;
@@ -1092,6 +1088,7 @@ input[type="text"]:focus {
   .google-desc {
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     position: relative;
