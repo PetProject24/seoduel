@@ -143,7 +143,7 @@ export default function Home() {
         <div className="hero-content">
           {/* Header */}
           <header>
-            <div className="badge">⚔️ Compare SEO instantly • Free demo</div>
+            <div className="badge">⚔️ Compare SEO instantly • LIVE ANALYSIS</div>
             <h1 className="logo">See who wins the SEO duel in seconds</h1>
             <p className="tagline">Enter your website and a competitor to instantly compare key SEO metrics and see who
               ranks stronger.</p>
