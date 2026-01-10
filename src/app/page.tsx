@@ -71,16 +71,19 @@ export default function Home() {
         fetchAnalysis(compUrl)
       ]);
 
-      const mapMetrics = (data: any) => ({
+      const mapMetrics = (data: any, url: string) => ({
         title: data.onpage.title.exists ? `${data.onpage.title.length} chars` : "Missing",
         isTitleGood: data.onpage.title.exists && data.onpage.title.length >= 30 && data.onpage.title.length <= 60,
+        fullTitle: data.onpage.title.text || "No Title Found",
         desc: data.onpage.meta.exists ? "Optimized" : "Missing",
         isDescGood: data.onpage.meta.exists,
+        fullDesc: data.onpage.meta.text || "No meta description found for this page.",
         headings: data.onpage.headings.h1Exists ? (data.onpage.headings.h1Unique ? "Well Structured" : "Multiple H1s") : "Missing H1",
         isHeadingsGood: data.onpage.headings.h1Exists && data.onpage.headings.h1Unique,
         wc: data.onpage.content.wordCount,
         mob: data.technical.https ? "Secure (HTTPS)" : "Not Secure",
         isMobGood: data.technical.https,
+        domain: url.replace(/^https?:\/\//, "").replace(/\/$/, ""),
       });
 
       setResults({
@@ -88,8 +91,8 @@ export default function Home() {
         compScore: compData.report.score,
         userWins: userData.report.score >= compData.report.score,
         metrics: {
-          user: mapMetrics(userData),
-          comp: mapMetrics(compData)
+          user: mapMetrics(userData, userUrl),
+          comp: mapMetrics(compData, compUrl)
         },
         userReport: userData.report,
         compReport: compData.report
@@ -118,72 +121,98 @@ export default function Home() {
 
   return (
     <div className="app-container">
-      {/* Header */}
-      <header>
-        <div className="badge">⚔️ Compare SEO instantly • Free demo</div>
-        <h1 className="logo">See who wins the SEO duel in seconds</h1>
-        <p className="tagline">Enter your website and a competitor to instantly compare key SEO metrics and see who
-          ranks stronger.</p>
-      </header>
-
-      {/* Main Input Section */}
-      <main>
-        <div className="duel-inputs">
-          <div className="input-group">
-            <label htmlFor="your-site">Your Website</label>
-            <input
-              type="text"
-              id="your-site"
-              placeholder="example.com"
-              autoComplete="off"
-              value={userUrl}
-              onChange={(e) => {
-                setUserUrl(e.target.value);
-                if (e.target.value && compUrl) setError(false);
-              }}
-            />
-          </div>
-
-          <div className="vs-badge">VS</div>
-
-          <div className="input-group">
-            <label htmlFor="competitor-site">Competitor Website</label>
-            <input
-              type="text"
-              id="competitor-site"
-              placeholder="competitor.com"
-              autoComplete="off"
-              value={compUrl}
-              onChange={(e) => {
-                setCompUrl(e.target.value);
-                if (userUrl && e.target.value) setError(false);
-              }}
-            />
+      {/* Sticky Navigation */}
+      <nav className="sticky-nav">
+        <div className="nav-content">
+          <div className="nav-logo">SEOduel</div>
+          <ul className="nav-links">
+            <li><a href="#what-we-analyze">What we analyze</a></li>
+            <li><a href="#how-seo-works">How SEO works</a></li>
+            <li><a href="#blog">Blog</a></li>
+          </ul>
+          <div className="nav-actions">
+            <button className="nav-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              Start free audit
+            </button>
           </div>
         </div>
+      </nav>
 
-        <ul className="feature-list">
-          <li><span className="check-icon">✓</span> 25+ ranking signals</li>
-          <li><span className="check-icon">✓</span> Real page data (not estimates)</li>
-          <li><span className="check-icon">✓</span> Clear winner, no SEO jargon</li>
-        </ul>
+      {/* Hero Section - Full Screen */}
+      <section className="hero-section">
+        <div className="hero-content">
+          {/* Header */}
+          <header>
+            <div className="badge">⚔️ Compare SEO instantly • Free demo</div>
+            <h1 className="logo">See who wins the SEO duel in seconds</h1>
+            <p className="tagline">Enter your website and a competitor to instantly compare key SEO metrics and see who
+              ranks stronger.</p>
+          </header>
 
-        <div className="action-area">
-          {!showResults && !isLoading && (
-            <button id="start-duel-btn" className="primary-btn" onClick={startDuel}>Start Duel</button>
-          )}
+          {/* Main Input Section */}
+          <main>
+            <div className="duel-inputs">
+              <div className="input-group">
+                <label htmlFor="your-site">Your Website</label>
+                <input
+                  type="text"
+                  id="your-site"
+                  placeholder="example.com"
+                  autoComplete="off"
+                  value={userUrl}
+                  onChange={(e) => {
+                    setUserUrl(e.target.value);
+                    if (e.target.value && compUrl) setError(false);
+                  }}
+                />
+              </div>
 
-          {isLoading && (
-            <div id="loading-indicator" className="loading">
-              <div className="spinner"></div> Analyzing...
+              <div className="vs-badge">VS</div>
+
+              <div className="input-group">
+                <label htmlFor="competitor-site">Competitor Website</label>
+                <input
+                  type="text"
+                  id="competitor-site"
+                  placeholder="competitor.com"
+                  autoComplete="off"
+                  value={compUrl}
+                  onChange={(e) => {
+                    setCompUrl(e.target.value);
+                    if (userUrl && e.target.value) setError(false);
+                  }}
+                />
+              </div>
             </div>
-          )}
 
-          {error && (
-            <p id="error-msg" className="error-message">Please enter both website URLs.</p>
-          )}
+            <ul className="feature-list">
+              <li><span className="check-icon">✓</span> 25+ ranking signals</li>
+              <li><span className="check-icon">✓</span> Real page data (not estimates)</li>
+              <li><span className="check-icon">✓</span> Clear winner, no SEO jargon</li>
+            </ul>
+
+            <div className="action-area">
+              {!showResults && !isLoading && (
+                <button id="start-duel-btn" className="primary-btn" onClick={startDuel}>Start Duel</button>
+              )}
+
+              {showResults && !isLoading && (
+                <button id="reset-btn-top" className="primary-btn" onClick={resetDuel}>New Comparison</button>
+              )}
+
+              {isLoading && (
+                <div id="loading-indicator" className="loading">
+                  <div className="spinner"></div> Analyzing...
+                </div>
+              )}
+
+              {error && (
+                <p id="error-msg" className="error-message">Please enter both website URLs.</p>
+              )}
+            </div>
+          </main>
         </div>
-      </main>
+      </section>
 
       {/* Results Section */}
       {showResults && results && (
@@ -273,12 +302,249 @@ export default function Home() {
             </table>
           </div>
 
-          <button id="reset-btn" className="secondary-btn" onClick={resetDuel}>New Comparison</button>
+          {/* Google Search Preview Section */}
+          <section className="google-preview-section">
+            <div className="google-preview-header">
+              <h2 className="google-preview-title">How users see your site in Google search</h2>
+              <p className="google-preview-subtitle">This is how your page may appear to people when they search on Google.</p>
+            </div>
+
+            <div className="google-preview-grid">
+              {/* Your Site Preview */}
+              <div className="google-preview-card-container">
+                <div className="google-preview-card-labels">
+                  <h3>Your site</h3>
+                </div>
+
+                <div className="google-card">
+                  <div className="google-card-header">
+                    <img
+                      src={`https://www.google.com/s2/favicons?domain=${results.metrics.user.domain}&sz=64`}
+                      alt=""
+                      className="google-favicon"
+                      onError={(e) => { (e.target as HTMLImageElement).src = "https://www.google.com/s2/favicons?domain=google.com&sz=64"; }}
+                    />
+                    <span className="google-domain">{results.metrics.user.domain}</span>
+                  </div>
+                  <div className="google-title">
+                    {results.metrics.user.fullTitle.substring(0, 60)}{results.metrics.user.fullTitle.length > 60 ? '...' : ''}
+                  </div>
+                  <div className="google-url">{`https://${results.metrics.user.domain}`}</div>
+                  <div className="google-desc">
+                    {results.metrics.user.fullDesc.substring(0, 155)}{results.metrics.user.fullDesc.length > 155 ? '...' : ''}
+                  </div>
+                </div>
+
+                <div className="google-card-hints">
+                  {results.metrics.user.fullTitle.length > 60 && (
+                    <p className="hint warning-text">⚠️ This title may be cut off in Google</p>
+                  )}
+                  {results.metrics.user.fullDesc.length > 155 || results.metrics.user.fullDesc.length < 50 ? (
+                    <p className="hint muted-text">This text helps users decide whether to click</p>
+                  ) : (
+                    <p className="hint success-text">Looks clear and readable 👍</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Competitor Site Preview */}
+              <div className="google-preview-card-container">
+                <div className="google-preview-card-labels">
+                  <h3>Competitor</h3>
+                </div>
+
+                <div className="google-card">
+                  <div className="google-card-header">
+                    <img
+                      src={`https://www.google.com/s2/favicons?domain=${results.metrics.comp.domain}&sz=64`}
+                      alt=""
+                      className="google-favicon"
+                      onError={(e) => { (e.target as HTMLImageElement).src = "https://www.google.com/s2/favicons?domain=google.com&sz=64"; }}
+                    />
+                    <span className="google-domain">{results.metrics.comp.domain}</span>
+                  </div>
+                  <div className="google-title">
+                    {results.metrics.comp.fullTitle.substring(0, 60)}{results.metrics.comp.fullTitle.length > 60 ? '...' : ''}
+                  </div>
+                  <div className="google-url">{`https://${results.metrics.comp.domain}`}</div>
+                  <div className="google-desc">
+                    {results.metrics.comp.fullDesc.substring(0, 155)}{results.metrics.comp.fullDesc.length > 155 ? '...' : ''}
+                  </div>
+                </div>
+
+                <div className="google-card-hints">
+                  {results.metrics.comp.fullTitle.length > 60 && (
+                    <p className="hint warning-text">⚠️ This title may be cut off in Google</p>
+                  )}
+                  {results.metrics.comp.fullDesc.length > 155 || results.metrics.comp.fullDesc.length < 50 ? (
+                    <p className="hint muted-text">This text helps users decide whether to click</p>
+                  ) : (
+                    <p className="hint success-text">Looks clear and readable 👍</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {results.userScore < results.compScore && (
+              <div className="conversion-helper-container">
+                <div className="conversion-helper">
+                  Improving this preview can significantly increase clicks from Google.
+                </div>
+              </div>
+            )}
+
+            <div className="google-to-strategy-divider">
+              <p className="divider-text">Below are the exact changes that will make this preview look better.</p>
+            </div>
+          </section>
         </section>
       )}
 
+      {/* Duel Results & Strategy Section */}
+      <section id="how-seo-works" className="strategy-section">
+        <div className="strategy-grid">
+          <h2 className="dashboard-title">How to win this SEO duel</h2>
+
+          {/* Empty State - shown only when no results */}
+          {!showResults && !isLoading && (
+            <div className="empty-state fade-in">
+              <div className="empty-state-hint">
+                <span className="hint-icon">📊</span>
+                <span className="hint-text">Example preview below</span>
+              </div>
+
+              <div className="demo-content">
+                <div className="demo-legend">
+                  <h3>PRIORITY LEGEND</h3>
+                  <div className="legend-items">
+                    <div className="legend-item">
+                      <span className="legend-dot critical"></span>
+                      <span className="legend-label"><strong>Critical</strong> — blocks your rankings</span>
+                    </div>
+                    <div className="legend-item">
+                      <span className="legend-dot warning"></span>
+                      <span className="legend-label"><strong>Warning</strong> — limits growth</span>
+                    </div>
+                    <div className="legend-item">
+                      <span className="legend-dot good"></span>
+                      <span className="legend-label"><strong>Good</strong> — already optimized</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="demo-results">
+                  <div className="demo-comparison">
+                    <div className="demo-score-row">
+                      <span className="demo-label">Your Website</span>
+                      <div className="demo-bar-wrapper">
+                        <div className="demo-bar" style={{ width: '45%', background: 'var(--primary)' }}></div>
+                      </div>
+                      <span className="demo-score">45</span>
+                    </div>
+                    <div className="demo-score-row">
+                      <span className="demo-label">Competitor</span>
+                      <div className="demo-bar-wrapper">
+                        <div className="demo-bar" style={{ width: '78%', background: 'var(--success)' }}></div>
+                      </div>
+                      <span className="demo-score">78</span>
+                    </div>
+                    <p className="demo-winner">Winner: Competitor</p>
+                  </div>
+
+                  <h3 className="demo-section-title">HOW TO WIN THIS SEO DUEL</h3>
+
+                  <div className="demo-cards">
+                    <div className="demo-card critical-border">
+                      <div className="demo-card-icon">🔴</div>
+                      <div className="demo-card-content">
+                        <h4>Fix missing H1 tags</h4>
+                        <p>Critical impact on search visibility.</p>
+                      </div>
+                    </div>
+                    <div className="demo-card warning-border">
+                      <div className="demo-card-icon">🟡</div>
+                      <div className="demo-card-content">
+                        <h4>Improve page speed</h4>
+                        <p>Slow load times increase bounce rates.</p>
+                      </div>
+                    </div>
+                    <div className="demo-card good-border">
+                      <div className="demo-card-icon">🟢</div>
+                      <div className="demo-card-content">
+                        <h4>HTTPS is active</h4>
+                        <p>Secure connection established.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Real Results - shown only when data exists */}
+          {showResults && results && (
+            <div className="fade-in">
+              {userUrl && (
+                <div className="dashboard-domain-divider">
+                  <span>{formatUrl(userUrl)}</span>
+                </div>
+              )}
+
+              {results?.userReport?.seoBreakdown && (
+                <div className="dashboard-breakdown">
+                  {(['onPage', 'technical', 'authority'] as const).map((key) => {
+                    const cat = results.userReport.seoBreakdown[key];
+                    return (
+                      <div key={key} className="breakdown-item">
+                        <div className="breakdown-info">
+                          <span className="breakdown-label">{cat.label}</span>
+                          <span className="breakdown-score">{cat.score}%</span>
+                        </div>
+                        <div className="breakdown-bar-bg">
+                          <div
+                            className={`breakdown-bar bar-${cat.priority}`}
+                            style={{ width: `${cat.score}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="dashboard-grid">
+                {(() => {
+                  const flatMetrics = results?.userReport?.sections?.flatMap((s: any) => s.metrics) || [];
+                  const severityOrder = { critical: 1, warning: 2, good: 3, unknown: 4 };
+                  const filteredMetrics = flatMetrics.filter((m: any) => m.status !== 'unknown');
+                  const sortedMetrics = [...filteredMetrics].sort((a: any, b: any) =>
+                    (severityOrder[a.status as keyof typeof severityOrder] || 5) -
+                    (severityOrder[b.status as keyof typeof severityOrder] || 5)
+                  );
+
+                  return sortedMetrics.map((item: any, i: number) => {
+                    const icon = item.status === 'critical' ? '🔴' : item.status === 'warning' ? '🟡' : '🟢';
+
+                    return (
+                      <div key={i} className={`dashboard-card status-${item.status}`}>
+                        <span className="card-icon-title">{icon} {item.title}</span>
+                        <div className="card-details">
+                          <p><strong>Problem:</strong> {item.plainExplanation}</p>
+                          <p><strong>Impact:</strong> {item.whyItMatters}</p>
+                          <p><strong>Next step:</strong> {item.action}</p>
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* SEO Checks Info Section */}
-      <section className="info-section">
+      <section id="what-we-analyze" className="info-section">
         <div className="info-header">
           <h2>What we analyze in this SEO duel</h2>
           <p>A clear breakdown of SEO checks used to determine the winner.</p>
@@ -295,16 +561,11 @@ export default function Home() {
               <li>Headings structure (H1–H3)</li>
               <li>Content length</li>
               <li>Keyword density</li>
-            </ul>
-            <ul className={`expanded-list ${expandedOnPage ? 'open' : ''}`} id="list-onpage">
               <li>Title keyword presence</li>
               <li>Meta description length</li>
               <li>H1 presence</li>
               <li>H1 uniqueness</li>
             </ul>
-            <p className="check-count" onClick={() => setExpandedOnPage(!expandedOnPage)}>
-              {expandedOnPage ? "Show less" : "Includes 9 checks"}
-            </p>
           </div>
 
           {/* Group 2 */}
@@ -317,16 +578,11 @@ export default function Home() {
               <li>HTTPS usage</li>
               <li>Indexability</li>
               <li>Core Web Vitals</li>
-            </ul>
-            <ul className={`expanded-list ${expandedTech ? 'open' : ''}`} id="list-tech">
               <li>Robots.txt presence</li>
               <li>Sitemap.xml presence</li>
               <li>Canonical tag</li>
               <li>Redirects</li>
             </ul>
-            <p className="check-count" onClick={() => setExpandedTech(!expandedTech)}>
-              {expandedTech ? "Show less" : "Includes 9 checks"}
-            </p>
           </div>
 
           {/* Group 3 */}
@@ -338,77 +594,10 @@ export default function Home() {
               <li>Internal links</li>
               <li>External links</li>
               <li>Domain age</li>
-            </ul>
-            <ul className={`expanded-list ${expandedAuth ? 'open' : ''}`} id="list-auth">
               <li>Referring domains</li>
               <li>Nofollow ratio</li>
               <li>Anchor text diversity</li>
             </ul>
-            <p className="check-count" onClick={() => setExpandedAuth(!expandedAuth)}>
-              {expandedAuth ? "Show less" : "Includes 7 checks"}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Duel Results & Strategy Section */}
-      <section className="strategy-section">
-        <div className="strategy-grid">
-          <h2 className="dashboard-title">How to win this SEO duel</h2>
-
-          {userUrl && (
-            <div className="dashboard-domain-divider">
-              <span>{formatUrl(userUrl)}</span>
-            </div>
-          )}
-
-          {results?.userReport?.seoBreakdown && (
-            <div className="dashboard-breakdown">
-              {(['onPage', 'technical', 'authority'] as const).map((key) => {
-                const cat = results.userReport.seoBreakdown[key];
-                return (
-                  <div key={key} className="breakdown-item">
-                    <div className="breakdown-info">
-                      <span className="breakdown-label">{cat.label}</span>
-                      <span className="breakdown-score">{cat.score}%</span>
-                    </div>
-                    <div className="breakdown-bar-bg">
-                      <div
-                        className={`breakdown-bar bar-${cat.priority}`}
-                        style={{ width: `${cat.score}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          <div className="dashboard-grid">
-            {(() => {
-              const flatMetrics = results?.userReport?.sections?.flatMap((s: any) => s.metrics) || [];
-              const severityOrder = { critical: 1, warning: 2, good: 3, unknown: 4 };
-              const filteredMetrics = flatMetrics.filter((m: any) => m.status !== 'unknown');
-              const sortedMetrics = [...filteredMetrics].sort((a: any, b: any) =>
-                (severityOrder[a.status as keyof typeof severityOrder] || 5) -
-                (severityOrder[b.status as keyof typeof severityOrder] || 5)
-              );
-
-              return sortedMetrics.map((item: any, i: number) => {
-                const icon = item.status === 'critical' ? '🔴' : item.status === 'warning' ? '🟡' : '🟢';
-
-                return (
-                  <div key={i} className={`dashboard-card status-${item.status}`}>
-                    <span className="card-icon-title">{icon} {item.title}</span>
-                    <div className="card-details">
-                      <p><strong>Problem:</strong> {item.plainExplanation}</p>
-                      <p><strong>Impact:</strong> {item.whyItMatters}</p>
-                      <p><strong>Next step:</strong> {item.action}</p>
-                    </div>
-                  </div>
-                );
-              });
-            })()}
           </div>
         </div>
       </section>
@@ -418,6 +607,6 @@ export default function Home() {
         <p>SEOduel MVP — Demo version. Results are simulated.</p>
       </footer>
 
-    </div>
+    </div >
   );
 }
