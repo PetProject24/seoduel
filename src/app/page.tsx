@@ -163,9 +163,9 @@ export default function Home() {
         </div>
 
         <ul className="feature-list">
-          <li><span className="check-icon">✓</span> 25+ SEO metrics</li>
-          <li><span className="check-icon">✓</span> Instant comparison</li>
-          <li><span className="check-icon">✓</span> No login required</li>
+          <li><span className="check-icon">✓</span> 25+ ranking signals</li>
+          <li><span className="check-icon">✓</span> Real page data (not estimates)</li>
+          <li><span className="check-icon">✓</span> Clear winner, no SEO jargon</li>
         </ul>
 
         <div className="action-area">
